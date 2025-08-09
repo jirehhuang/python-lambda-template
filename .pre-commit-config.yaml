@@ -6,7 +6,7 @@ repos:
       - id: black
 
   # Ruff for linting & autofix
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.7
     hooks:
       - id: ruff
