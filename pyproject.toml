@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "python-lambda-template"
+version = "0.1.0"
+description = "AWS Lambda Python template using Poetry"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-cov = "^5.0"
+pylint = "^3.0"
+black = "^24.0"
+ruff = "^0.4"
+flake8 = "^7.0"
+mypy = "^1.8"
+pre-commit = "^3.6"
+commitizen = "^4.8.3"
+
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-report=term-missing"
+
+[tool.black]
+line-length = 79
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 79
+lint.select = ["E", "F", "I"]
+lint.ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
