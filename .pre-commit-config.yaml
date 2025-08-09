@@ -21,3 +21,9 @@ repos:
         entry: pylint
         language: system
         types: [python]
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.27.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]  # <-- THIS IS KEY
