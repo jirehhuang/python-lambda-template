@@ -1,19 +1,31 @@
 repos:
+  # Black formatter
   - repo: https://github.com/psf/black
     rev: 24.4.2
     hooks:
       - id: black
 
+  # Ruff for linting & autofix
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.4.7
     hooks:
       - id: ruff
+        args: [--fix]
 
+  # Flake8 (extra linting rules beyond Ruff)
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.0
+    hooks:
+      - id: flake8
+
+  # MyPy type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:
       - id: mypy
+        additional_dependencies: []
 
+  # Local pylint
   - repo: local
     hooks:
       - id: pylint
@@ -22,8 +34,9 @@ repos:
         language: system
         types: [python]
 
+  # Commitizen for commit message validation
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v3.27.0
     hooks:
       - id: commitizen
-        stages: [commit-msg]  # <-- THIS IS KEY
+        stages: [commit-msg]
