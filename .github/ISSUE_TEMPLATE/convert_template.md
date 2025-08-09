@@ -10,7 +10,7 @@ assignees: []
 
 - [ ] Add `main` ruleset
 - [ ] Tailor the README
-- [ ] Delete the [issue template](.github/ISSUE_TEMPLATE/convert_template.md)
+- [ ] Delete the issue template
 - [ ] Modify the docstring in `__init__.py`
 
 # Instructions
