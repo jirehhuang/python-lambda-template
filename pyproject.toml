@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Python AWS Lambda template"
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
-packages = [{ include = "src" }]
+packages = [{ include = "PACKAGE" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -61,5 +61,5 @@ tag_format = "v$version"
 update_changelog_on_bump = true
 
 [tool.pytest.ini_options]
-addopts = "-v --cov=src --cov-report=term-missing --cov-report=xml:coverage.xml"
+addopts = "-v --cov=PACKAGE --cov-report=term-missing --cov-report=xml:coverage.xml"
 testpaths = ["tests"]
