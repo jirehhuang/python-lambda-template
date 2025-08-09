@@ -2,7 +2,7 @@
 name = "python-lambda-template"
 version = "0.1.0"
 description = "Python AWS Lambda template"
-authors = ["Your Name <you@example.com>"]
+authors = ["Jireh Huang <ijirehhuang@gmail.com>"]
 readme = "README.md"
 packages = [{ include = "PACKAGE" }]
 
