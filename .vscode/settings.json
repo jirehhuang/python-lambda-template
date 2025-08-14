@@ -1,0 +1,4 @@
+{
+    "editor.rulers": [79],  // PEP 8
+    "workbench.editor.wrapTabs": true,
+}
