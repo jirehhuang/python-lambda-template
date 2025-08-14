@@ -1,0 +1,63 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  lint-and-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout repo
+      - uses: actions/checkout@v4
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Install Poetry
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: "1.8.3"
+
+      # Install dependencies (including dev)
+      - name: Install dependencies
+        run: poetry install
+
+      # Run pre-commit hooks (formatting, linting, mypy, pylint)
+      - name: Run pre-commit
+        run: poetry run pre-commit run --all-files
+
+      # Run pylint
+      - name: Run pylint
+        run: |
+          SCORE=$(poetry run pylint lambda_function --exit-zero --score=y | grep "Your code has been rated at" | awk '{print $7}' | cut -d'/' -f1)
+          echo "Pylint score: $SCORE"
+          if (( $(echo "$SCORE < 10.0" | bc -l) )); then
+            echo "ERROR: Pylint score < 10.0"
+            exit 1
+          fi
+
+      # Run tests
+      - name: Run tests
+        run: poetry run pytest
+
+      # Enforce coverage >= 95%
+      - name: Check coverage
+        run: poetry run python .github/scripts/check_coverage.py --min 95 coverage.xml
+
+  # PR title validation
+  pr-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          requireScope: false
