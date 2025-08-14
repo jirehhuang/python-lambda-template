@@ -52,7 +52,7 @@ dmypy.json
 .pylint.d/
 
 # IDEs and editors
-.vscode/
+# .vscode/
 .idea/
 *.swp
 *.swo
