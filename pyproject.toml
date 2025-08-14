@@ -10,7 +10,7 @@ packages = [{ include = "lambda_function" }]
 python = "^3.12"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.4.2"
+black = "^25.1.0"
 ruff = "^0.4.7"
 flake8 = "^7.1.0"
 mypy = "^1.8.0"
