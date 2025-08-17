@@ -16,7 +16,7 @@ jobs:
 
     steps:
       # Checkout repo
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Set up Python
       - name: Set up Python
@@ -61,7 +61,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - uses: amannn/action-semantic-pull-request@v6
         env:
