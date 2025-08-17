@@ -198,7 +198,7 @@ jobs:
           set -euo pipefail
           API_NAME="${FUNCTION_NAME}-api"
           
-          api_id=$(aws apigatewayv2 get-apis \
+          api_id=$(aws apigateway get-rest-apis \
             --query "Items[?Name=='${API_NAME}'].ApiId" \
             --output text)
 
