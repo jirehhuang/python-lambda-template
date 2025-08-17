@@ -147,20 +147,33 @@ jobs:
       - name: Deploy to Lambda staging alias
         id: deploy
         run: |
-          set -e
+          set -euo pipefail
+
           STAGING_ALIAS="${FUNCTION_NAME}-staging"
+
+          # Update Lambda function code and publish a new version
           VERSION=$(aws lambda update-function-code \
             --function-name "${FUNCTION_NAME}" \
             --zip-file fileb://lambda.zip \
             --publish \
             --query 'Version' --output text)
 
+          echo "Waiting for Lambda function version ${VERSION} to become active..."
+          aws lambda wait function-updated --function-name "${FUNCTION_NAME}"
+
           echo "Deployed version: ${VERSION}"
 
+          # Create or update staging alias
           if ! aws lambda get-alias --function-name "${FUNCTION_NAME}" --name "${STAGING_ALIAS}" >/dev/null 2>&1; then
-            aws lambda create-alias --function-name "${FUNCTION_NAME}" --name "${STAGING_ALIAS}" --function-version "${VERSION}"
+            aws lambda create-alias \
+              --function-name "${FUNCTION_NAME}" \
+              --name "${STAGING_ALIAS}" \
+              --function-version "${VERSION}"
           else
-            aws lambda update-alias --function-name "${FUNCTION_NAME}" --name "${STAGING_ALIAS}" --function-version "${VERSION}"
+            aws lambda update-alias \
+              --function-name "${FUNCTION_NAME}" \
+              --name "${STAGING_ALIAS}" \
+              --function-version "${VERSION}"
           fi
 
           echo "alias_version=${VERSION}" >> "$GITHUB_OUTPUT"
