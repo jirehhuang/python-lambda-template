@@ -11,6 +11,18 @@ on:
     branches: [main]
 
 jobs:
+  pr-title:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          requireScope: false
+
   lint-and-tests:
     runs-on: ubuntu-latest
 
@@ -55,16 +67,3 @@ jobs:
       # Enforce coverage >= 95%
       - name: Check coverage
         run: poetry run python .github/scripts/check_coverage.py --min 95 coverage.xml
-
-  # PR title validation
-  pr-title:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - uses: amannn/action-semantic-pull-request@v5
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          requireScope: false
