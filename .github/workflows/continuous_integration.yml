@@ -35,7 +35,7 @@ jobs:
 
     steps:
       # Checkout repo
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Set up Python
       - name: Set up Python
@@ -45,7 +45,7 @@ jobs:
 
       # Install Poetry
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v3
+        uses: abatilo/actions-poetry@v4
         with:
           poetry-version: "1.8.3"
 
