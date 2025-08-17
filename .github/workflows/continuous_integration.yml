@@ -196,7 +196,7 @@ jobs:
       - name: Get staging alias API URL
         run: |
           set -euo pipefail
-          API_NAME="${FUNCTION_NAME}-staging"
+          API_NAME="${FUNCTION_NAME}-api"
           
           api_id=$(aws apigatewayv2 get-apis \
             --query "Items[?Name=='${API_NAME}'].ApiId" \
@@ -207,6 +207,7 @@ jobs:
             exit 1
           fi
 
-          url="https://${api_id}.execute-api.${AWS_REGION}.amazonaws.com/staging"
-          echo "Staging API URL: $url"
+          url="https://${api_id}.execute-api.${AWS_REGION}.amazonaws.com"
+
+          echo "✅ Staging API URL: $url"
           echo "api_url=$url" >> "$GITHUB_OUTPUT"
