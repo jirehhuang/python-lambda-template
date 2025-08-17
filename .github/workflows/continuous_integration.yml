@@ -11,9 +11,11 @@ on:
     branches: [main]
 
 env:
+  FUNCTION_NAME: "python-lambda-template"
   PYTHON_VERSION: "3.12"
   AWS_REGION: "us-west-1"
   AWS_ACCOUNT_ID: "670469590993"
+  GH_OIDC_ROLE_NAME: "github-jirehhuang-oidc-lambda-deployer"
 
 jobs:
   pr-title:
@@ -72,3 +74,88 @@ jobs:
       # Enforce coverage >= 95%
       - name: Check coverage
         run: poetry run python .github/scripts/check_coverage.py --min 95 coverage.xml
+
+  deploy-staging:
+    if: github.event_name == 'pull_request'
+    needs: [lint-and-tests]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: staging-deploy
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: "1.8.3"
+
+      - name: Install deps for packaging
+        run: poetry install --only main
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.GH_OIDC_ROLE_NAME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Check if Lambda execution role exists
+        run: |
+          set -e
+          ROLE_NAME="${FUNCTION_NAME}-role"
+          if ! aws iam get-role --role-name "${ROLE_NAME}" >/dev/null 2>&1; then
+            echo "Execution role ${ROLE_NAME} does not exist. Please create it first."
+            exit 1
+          fi
+
+      - name: Build Lambda ZIP
+        run: |
+          set -e
+          BUILD_DIR=".package"
+          rm -rf "$BUILD_DIR" lambda.zip
+          mkdir -p "$BUILD_DIR"
+          poetry export -f requirements.txt --without-hashes | pip install -r /dev/stdin -t "$BUILD_DIR"
+          cp -r lambda_function/ "$BUILD_DIR"/
+          cd "$BUILD_DIR" && zip -r ../lambda.zip .
+
+      - name: Ensure Lambda function exists
+        run: |
+          set -e
+          ROLE_NAME="${FUNCTION_NAME}-role"
+          if ! aws lambda get-function --function-name "${FUNCTION_NAME}" >/dev/null 2>&1; then
+            echo "Creating Lambda function ${FUNCTION_NAME}"
+            aws lambda create-function \
+              --function-name "${FUNCTION_NAME}" \
+              --runtime "python${PYTHON_VERSION}" \
+              --role "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}" \
+              --handler lambda_function.lambda_handler \
+              --zip-file fileb://lambda.zip
+          else
+            echo "Lambda function ${FUNCTION_NAME} already exists"
+          fi
+
+      - name: Deploy to Lambda staging alias
+        id: deploy
+        run: |
+          set -e
+          STAGING_ALIAS="${FUNCTION_NAME}-staging"
+          VERSION=$(aws lambda update-function-code \
+            --function-name "${FUNCTION_NAME}" \
+            --zip-file fileb://lambda.zip \
+            --publish \
+            --query 'Version' --output text)
+
+          echo "Deployed version: ${VERSION}"
+
+          if ! aws lambda get-alias --function-name "${FUNCTION_NAME}" --name "${STAGING_ALIAS}" >/dev/null 2>&1; then
+            aws lambda create-alias --function-name "${FUNCTION_NAME}" --name "${STAGING_ALIAS}" --function-version "${VERSION}"
+          else
+            aws lambda update-alias --function-name "${FUNCTION_NAME}" --name "${STAGING_ALIAS}" --function-version "${VERSION}"
+          fi
+
+          echo "alias_version=${VERSION}" >> "$GITHUB_OUTPUT"
