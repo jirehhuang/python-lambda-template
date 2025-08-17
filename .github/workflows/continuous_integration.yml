@@ -105,12 +105,27 @@ jobs:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.GH_OIDC_ROLE_NAME }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Check if Lambda execution role exists
+      - name: Check if Lambda execution role exists and has required policy
         run: |
-          set -e
+          set -euo pipefail
+
           ROLE_NAME="${FUNCTION_NAME}-role"
+
+          # Check that the role exists
           if ! aws iam get-role --role-name "${ROLE_NAME}" >/dev/null 2>&1; then
-            echo "Execution role ${ROLE_NAME} does not exist. Please create it first."
+            echo "❌ Execution role ${ROLE_NAME} does not exist. Please create it first."
+            exit 1
+          fi
+          echo "✅ Role ${ROLE_NAME} exists"
+
+          # Check for AWSLambdaBasicExecutionRole managed policy attachment
+          attached=$(aws iam list-attached-role-policies --role-name "${ROLE_NAME}" \
+                    --query 'AttachedPolicies[*].PolicyName' --output text)
+
+          if echo "$attached" | grep -q "AWSLambdaBasicExecutionRole"; then
+            echo "✅ Role has AWSLambdaBasicExecutionRole attached"
+          else
+            echo "❌ Role is missing AWSLambdaBasicExecutionRole"
             exit 1
           fi
 
