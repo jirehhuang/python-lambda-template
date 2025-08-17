@@ -126,8 +126,9 @@ jobs:
 
       - name: Ensure Lambda function exists
         run: |
-          set -e
+          set -euo pipefail
           ROLE_NAME="${FUNCTION_NAME}-role"
+
           if ! aws lambda get-function --function-name "${FUNCTION_NAME}" >/dev/null 2>&1; then
             echo "Creating Lambda function ${FUNCTION_NAME}"
             aws lambda create-function \
@@ -136,6 +137,9 @@ jobs:
               --role "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}" \
               --handler lambda_function.lambda_handler \
               --zip-file fileb://lambda.zip
+
+            echo "Waiting for Lambda function to become active..."
+            aws lambda wait function-active --function-name "${FUNCTION_NAME}"
           else
             echo "Lambda function ${FUNCTION_NAME} already exists"
           fi
