@@ -1,8 +1,9 @@
 name: Continuous Integration
 
 permissions:
-  pull-requests: write
   contents: read
+  id-token: write
+  pull-requests: write
 
 on:
   pull_request:
