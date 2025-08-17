@@ -60,7 +60,7 @@ jobs:
         run: |
           SCORE=$(poetry run pylint lambda_function --exit-zero --score=y | grep "Your code has been rated at" | awk '{print $7}' | cut -d'/' -f1)
           echo "Pylint score: $SCORE"
-          if (( $(echo "$SCORE < 10.0" | bc -l) )); then
+          if ! python -c "exit(0 if float('$SCORE') >= 10.0 else 1)"; then
             echo "ERROR: Pylint score < 10.0"
             exit 1
           fi
