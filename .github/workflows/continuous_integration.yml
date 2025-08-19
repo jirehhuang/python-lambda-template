@@ -52,7 +52,28 @@ jobs:
 
       - name: Run pre-commit
         run: |
-          poetry run pre-commit run --all-files
+          echo "=== Python version ==="
+          python --version
+          which python
+
+          echo "=== Poetry environment info ==="
+          poetry env info
+
+          echo "=== Installed packages (poetry show) ==="
+          poetry show --tree
+
+          echo "=== Checking for requests and types-requests ==="
+          poetry run pip show requests || echo "requests NOT installed"
+          poetry run pip show types-requests || echo "types-requests NOT installed"
+
+          echo "=== Mypy version ==="
+          poetry run mypy --version
+
+          echo "=== Mypy config location ==="
+          poetry run mypy --show-config | head -n 40
+
+          echo "=== Running pre-commit ==="
+          poetry run pre-commit run --all-files --verbose
 
       - name: Run pylint
         run: |
