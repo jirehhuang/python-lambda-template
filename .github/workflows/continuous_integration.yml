@@ -52,6 +52,7 @@ jobs:
 
       - name: Run pre-commit
         run: |
+          poetry run mypy --clear-cache
           poetry run pre-commit clean
           poetry run pre-commit run --all-files
 
