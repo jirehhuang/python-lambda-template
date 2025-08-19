@@ -192,3 +192,29 @@ jobs:
           fi
 
           echo "alias_version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Get staging alias API URL
+        id: get-api-url
+        run: |
+          set -euo pipefail
+          API_NAME="${FUNCTION_NAME}-api-staging"
+          
+          api_id=$(aws apigateway get-rest-apis \
+            --query "Items[?Name=='${API_NAME}'].ApiId" \
+            --output text)
+
+          if [ -z "$api_id" ]; then
+            echo "❌ API Gateway for ${API_NAME} does not exist. Please create it first."
+            exit 1
+          fi
+
+          url="https://${api_id}.execute-api.${AWS_REGION}.amazonaws.com"
+
+          echo "✅ Staging API URL: $url"
+          echo "api_url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Run staging E2E tests
+        run: |
+          poetry run pytest tests/e2e --url "${{ steps.get-api-url.outputs.api_url }}/staging"
+        env:
+          STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
