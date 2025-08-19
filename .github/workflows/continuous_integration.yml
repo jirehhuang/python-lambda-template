@@ -214,3 +214,100 @@ jobs:
           poetry run pytest tests/e2e --url "${{ steps.get-api-url.outputs.api_url }}/staging"
         env:
           STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
+
+  deploy-prod:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: prod-deploy
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: "1.8.3"
+
+      - name: Install deps for packaging
+        run: poetry install --only main
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.GH_OIDC_ROLE_NAME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Build Lambda ZIP
+        run: |
+          set -e
+          BUILD_DIR=".package"
+          rm -rf "$BUILD_DIR" lambda.zip
+          mkdir -p "$BUILD_DIR"
+          poetry export -f requirements.txt --without-hashes | pip install -r /dev/stdin -t "$BUILD_DIR"
+          cp -r lambda_function/ "$BUILD_DIR"/
+          cd "$BUILD_DIR" && zip -r ../lambda.zip .
+
+      - name: Deploy to Lambda prod alias
+        id: deploy
+        run: |
+          set -euo pipefail
+
+          PROD_ALIAS="prod"
+
+          VERSION=$(aws lambda update-function-code \
+            --function-name "${FUNCTION_NAME}" \
+            --zip-file fileb://lambda.zip \
+            --publish \
+            --query 'Version' --output text)
+
+          echo "Waiting for Lambda function version ${VERSION} to become active..."
+          aws lambda wait function-updated --function-name "${FUNCTION_NAME}"
+
+          echo "Deployed version: ${VERSION}"
+
+          if ! aws lambda get-alias --function-name "${FUNCTION_NAME}" --name "${PROD_ALIAS}" >/dev/null 2>&1; then
+            aws lambda create-alias \
+              --function-name "${FUNCTION_NAME}" \
+              --name "${PROD_ALIAS}" \
+              --function-version "${VERSION}"
+          else
+            aws lambda update-alias \
+              --function-name "${FUNCTION_NAME}" \
+              --name "${PROD_ALIAS}" \
+              --function-version "${VERSION}"
+          fi
+
+          echo "alias_version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Get prod alias API URL
+        id: get-api-url
+        run: |
+          set -euo pipefail
+          API_NAME="${FUNCTION_NAME}-api-prod"
+
+          api_id=$(aws apigateway get-rest-apis \
+            --query "items[?name=='${API_NAME}'].id" \
+            --output text)
+
+          if [ -z "$api_id" ] || [ "$api_id" = "None" ]; then
+            echo "❌ API Gateway for ${API_NAME} does not exist. Please create it first."
+            exit 1
+          fi
+
+          url="https://${api_id}.execute-api.${AWS_REGION}.amazonaws.com"
+
+          echo "✅ Prod API URL: $url"
+          echo "api_url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Run prod E2E tests
+        run: |
+          poetry install
+          poetry run pytest tests/e2e --url "${{ steps.get-api-url.outputs.api_url }}/prod"
+        env:
+          PROD_API_KEY: ${{ secrets.PROD_API_KEY }}
