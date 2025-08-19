@@ -217,7 +217,7 @@ jobs:
 
   deploy-prod:
     if: github.event_name == 'pull_request'
-    needs: [lint-and-tests]
+    needs: [lint-and-tests, deploy-staging]
     runs-on: ubuntu-latest
     concurrency:
       group: prod-deploy
