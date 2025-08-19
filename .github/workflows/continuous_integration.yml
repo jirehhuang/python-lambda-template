@@ -191,11 +191,15 @@ jobs:
           set -euo pipefail
           API_NAME="${FUNCTION_NAME}-api-staging"
           
+          echo "Looking up API named: $API_NAME"
+
+          aws apigateway get-rest-apis --query "items[].{id:id,name:name}" --output table
+
           api_id=$(aws apigateway get-rest-apis \
-            --query "Items[?Name=='${API_NAME}'].ApiId" \
+            --query "items[?name=='${API_NAME}'].id" \
             --output text)
 
-          if [ -z "$api_id" ]; then
+          if [ -z "$api_id" ] || [ "$api_id" = "None" ]; then
             echo "❌ API Gateway for ${API_NAME} does not exist. Please create it first."
             exit 1
           fi
