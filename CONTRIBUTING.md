@@ -25,7 +25,7 @@
 Optionally, set up [remote development using SSH](https://code.visualstudio.com/docs/remote/ssh) by using the following prompt:
 
 ```
-I want to set up remote development using the Visual Studio Code Remote - SSH extension. I am connecting to my Host named {Host} with HostName {HostName}, User {User}, Port {Port}, and IdentityFile named {DeviceName}.pem. Please walk me through setting this up on my {system: Windows, M-series Mac OS, Ubuntu} device step by step, including creating a Ed25519 key pair in PEM format.
+I want to set up remote development using the Visual Studio Code Remote - SSH extension. I am connecting to my Host named {Host} with HostName {HostName}, User {User}, Port {Port}, and IdentityFile named {DeviceName}.pem. Please walk me through setting this up on my {system: Windows, M-series Mac OS, Ubuntu} device step by step, including creating an Ed25519 key pair in PEM format.
 ```
 
 If on Mac OS, make sure to [give Local Network access to VS Code](https://github.com/microsoft/vscode/issues/228862#issuecomment-2358636415).
