@@ -216,7 +216,7 @@ jobs:
           STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
 
   deploy-prod:
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     concurrency:
       group: prod-deploy
