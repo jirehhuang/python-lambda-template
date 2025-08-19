@@ -164,7 +164,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          STAGING_ALIAS="${FUNCTION_NAME}-staging"
+          STAGING_ALIAS="staging"
 
           # Update Lambda function code and publish a new version
           VERSION=$(aws lambda update-function-code \
