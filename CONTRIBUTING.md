@@ -12,7 +12,7 @@
 	1. Identity provider: http://tokens.actions.githubusercontent.com/ (created in previous step)
 	1. Specify GitHub organization (`org`), repository, and branch
 	1. Add permissions: `AWSLambda_FullAccess`, `IAMReadOnlyAccess`, and `AmazonAPIGatewayAdministrator`
-	1. Role name:` github-{org}-oidc-lambda-deployer`
+	1. Role name: `github-{org}-oidc-lambda-deployer`
 	1. Update `GH_OIDC_ROLE_NAME` in [continuous_integration.yml](.github/workflows/continuous_integration.yml)
 
 ### New system
