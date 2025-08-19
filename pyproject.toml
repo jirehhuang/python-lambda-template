@@ -8,6 +8,8 @@ packages = [{ include = "lambda_function" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
+requests = "^2.32.4"
+types-requests = "^2.32.4.20250809"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
@@ -19,6 +21,7 @@ pytest = "^8.2.0"
 pytest-cov = "^6.2.1"
 commitizen = "^4.8.3"
 pre-commit = "^4.3.0"
+python-dotenv = "^1.1.1"
 
 [build-system]
 requires = ["poetry-core"]
