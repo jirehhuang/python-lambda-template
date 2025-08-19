@@ -150,7 +150,7 @@ jobs:
               --function-name "${FUNCTION_NAME}" \
               --runtime "python${PYTHON_VERSION}" \
               --role "arn:aws:iam::${AWS_ACCOUNT_ID}:role/${ROLE_NAME}" \
-              --handler lambda_function.lambda_handler \
+              --handler lambda_function.lambda_function.lambda_handler \
               --zip-file fileb://lambda.zip
 
             echo "Waiting for Lambda function to become active..."
@@ -192,22 +192,3 @@ jobs:
           fi
 
           echo "alias_version=${VERSION}" >> "$GITHUB_OUTPUT"
-
-      - name: Get staging alias API URL
-        run: |
-          set -euo pipefail
-          API_NAME="${FUNCTION_NAME}-api"
-          
-          api_id=$(aws apigateway get-rest-apis \
-            --query "Items[?Name=='${API_NAME}'].ApiId" \
-            --output text)
-
-          if [ -z "$api_id" ]; then
-            echo "❌ API Gateway for ${API_NAME} does not exist. Please create it first."
-            exit 1
-          fi
-
-          url="https://${api_id}.execute-api.${AWS_REGION}.amazonaws.com"
-
-          echo "✅ Staging API URL: $url"
-          echo "api_url=$url" >> "$GITHUB_OUTPUT"
