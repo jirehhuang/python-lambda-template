@@ -52,8 +52,6 @@ jobs:
 
       - name: Run pre-commit
         run: |
-          poetry run mypy --install-types
-          poetry run pre-commit clean
           poetry run pre-commit run --all-files
 
       - name: Run pylint
