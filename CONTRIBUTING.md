@@ -54,7 +54,7 @@ poetry shell
 Development-only dependencies:
 
 ```
-poetry add --dev pkgname
+poetry add --group dev pkgname
 ```
 
 Production/runtime dependencies:
