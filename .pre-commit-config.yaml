@@ -23,8 +23,9 @@ repos:
     rev: v1.8.0
     hooks:
       - id: mypy
-        additional_dependencies: []
         args: ["--config-file=pyproject.toml"]
+        additional_dependencies: []
+        language: system
         entry: poetry run mypy
 
   # Local pylint
