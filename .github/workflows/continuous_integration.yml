@@ -207,6 +207,7 @@ jobs:
 
       - name: Run staging E2E tests
         run: |
+          poetry install
           poetry run pytest tests/e2e --url "${{ steps.get-api-url.outputs.api_url }}/staging"
         env:
           STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
