@@ -24,6 +24,7 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: []
+        language: system
 
   # Local pylint
   - repo: local
