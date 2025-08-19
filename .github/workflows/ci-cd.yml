@@ -216,7 +216,8 @@ jobs:
           STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
 
   deploy-prod:
-    if: github.event_name == 'push'
+    if: github.event_name == 'pull_request'
+    needs: [lint-and-tests]
     runs-on: ubuntu-latest
     concurrency:
       group: prod-deploy
