@@ -68,5 +68,5 @@ dmypy.json
 # Temporary files
 tmp/
 
-# Sensitive files
+# Secrets
 .env
