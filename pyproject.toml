@@ -10,6 +10,7 @@ packages = [{ include = "lambda_function" }]
 python = "^3.12"
 requests = "^2.32.4"
 types-requests = "^2.32.4.20250809"
+ask-sdk-core = "^1.19.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
