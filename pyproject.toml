@@ -39,8 +39,16 @@ target-version = ["py312"]
 
 [tool.ruff]
 line-length = 79
+target-version = "py312"
 select = ["E", "F", "W", "B", "UP"]
 ignore = []
+fix = true
+
+[tool.ruff.lint]
+select = ["D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
 
 [tool.flake8]
 max-line-length = 79
