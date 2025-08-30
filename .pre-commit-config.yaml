@@ -35,6 +35,16 @@ repos:
         language: system
         types: [python]
 
+  # Pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: mixed-line-ending
+
   # Commitizen for commit message validation
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v3.27.0
