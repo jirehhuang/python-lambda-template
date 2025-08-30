@@ -41,12 +41,11 @@ target-version = ["py312"]
 [tool.ruff]
 line-length = 79
 target-version = "py312"
-select = ["E", "F", "W", "B", "UP"]
-ignore = []
 fix = true
 
 [tool.ruff.lint]
-select = ["D"]
+select = ["B", "D", "E", "ERA", "F", "I", "N", "PL", "RUF", "W"]
+ignore = []
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
