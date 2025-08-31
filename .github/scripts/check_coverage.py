@@ -13,11 +13,12 @@ from __future__ import annotations
 
 import argparse
 import sys
-import xml.etree.ElementTree as ET
 from pathlib import Path
+from xml.etree import ElementTree
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse arguments."""
     p = argparse.ArgumentParser(
         description="Enforce minimum line coverage from coverage.xml"
     )
@@ -36,6 +37,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Estimate coverage.."""
     args = parse_args()
 
     if not args.file.is_file():
@@ -45,11 +47,11 @@ def main() -> None:
         sys.exit(1)
 
     try:
-        tree = ET.parse(args.file)
+        tree = ElementTree.parse(args.file)
         root = tree.getroot()
         # Pytest-cov coverage.xml has a "line-rate" attribute on <coverage>
         line_rate = float(root.attrib["line-rate"])
-    except (ET.ParseError, KeyError, ValueError) as e:
+    except (ElementTree.ParseError, KeyError, ValueError) as e:
         print(f"ERROR: Failed to parse coverage XML: {e}", file=sys.stderr)
         sys.exit(1)
 
