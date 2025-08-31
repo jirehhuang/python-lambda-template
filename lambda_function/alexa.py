@@ -21,8 +21,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-DEBUG_VOICE = 1
-
 SPEAK_OUTPUT = {
     "launch": [
         "How can I help?",
@@ -114,10 +112,9 @@ class GeneralIntentHandler(AbstractRequestHandler):
             if not speak_output:
                 raise ValueError("No valid query provided.")
 
-        except Exception as e:  # pylint: disable=broad-exception-caught
+        # pylint: disable=broad-exception-caught
+        except Exception as e:  # pragma: no cover
             speak_output = f"Error in GeneralIntentHandler.handle(): {e!s}"
-            if not DEBUG_VOICE:
-                raise
 
         return (
             handler_input.response_builder.speak(speak_output)

@@ -3,7 +3,7 @@
 import json
 from typing import Any
 
-from .alexa import DEBUG_VOICE, _text_output, alexa_handler
+from .alexa import _text_output, alexa_handler
 from .responder import echo
 from .utils import _make_response
 
@@ -50,9 +50,8 @@ def lambda_handler(event: Any, context: Any) -> Any:
             arn=arn,
         )
 
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        if not DEBUG_VOICE:
-            raise
+    # pylint: disable=broad-exception-caught
+    except Exception as e:  # pragma: no cover
         return _make_response(
             status="error",
             data={"error": "Error in lambda_handler(): " + str(e)},
