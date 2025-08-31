@@ -1,6 +1,7 @@
 """Test functions in utils.py."""
 
 import json
+
 import pytest
 
 from lambda_function.utils import _make_response
