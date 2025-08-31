@@ -32,28 +32,15 @@ Create and activate a branch ruleset named `main ruleset` that applies to the de
 ## Create Lambda execution role
 
 [Create Lambda execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html#permissions-executionrole-console) named `{FUNCTION_NAME}-role` with policy `AWSLambdaBasicExecutionRole`. Attach any additional policies that the function will require, such as `AmazonDynamoDBFullAccess`.
+If named correctly, this role will automatically be attached to the Lambda when it is created by the workflow.
 
 ## Add API Gateway trigger
 
-After creating the pull request for this convert template issue, a Lambda named `FUNCTION_NAME` should be created by the workflow. 
+1. Navigate to AWS Console > API Gateway and create a new REST API with name "`FUNCTION_NAME`-staging" (Regional, IPv4)
+1. Create a method with type ANY and integration with Lambda function "{`FUNCTION_NAME` ARN}:staging", where the appended ":staging" points to the staging alias
+1. Edit the method request settings to require API key
+1. Deploy the API to a new stage named "staging" and copy the invoke URL to `.env` as `STAGING_API_URL`
+1. Create a usage plan named "`FUNCTION_NAME`-plan-staging" and add the associated REST API and stage
+1. Add a new API key named "`FUNCTION_NAME`-api-key-staging" and add it to `.env` and [GitHub actions secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) as `STAGING_API_KEY`
 
-1. Create REST API
-    1. Navigate to AWS Console > API Gateway > Create API > REST API (Build)
-    1. New API, API name: `FUNCTION_NAME`, API Endpoint type: Regional > Create API
-1. Add proxy resources
-    1. Create resource > Resource path: /, Resource name: staging > Create resource
-    1. Create resource > Proxy resource: True, Resource path: /staging/, Resource name: {proxy+} > Create resource
-1. Add ANY method with Lambda proxy integration
-    1. Select /staging/{proxy+}/ANY > Edit integration
-    1. Select Lambda function, appropriate region, and ARN for `FUNCTION_NAME`
-    1. Append `:{FUNCTION_NAME}-staging` to the Lambda function ARN (e.g., `...function:python-lambda-template:python-lambda-template-staging`) > Save
-1. Require API key
-    1. Select /staging/{proxy+}/ANY > Method request > Edit
-    1. API key required: True > Save
-1. Deploy API > Stage: No stage
-1. Create usage plan and API keys
-    1. Usage plans > Create usage plan > Name: `{FUNCTION_NAME}-plan-staging`
-    1. Associated API keys > Add API key > Create and add new key, Name: `{FUNCTION_NAME}-api-key-staging`
-    1. [Add to GitHub Actions Secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets) as `STAGING_API_KEY`
-
-After merging the pull request into `main`, repeat these steps for "prod" in place of "staging" and re-run the workflow.
+After merging the pull request into `main`, repeat these steps for "prod" in place of "staging" and re-run the workflow. You can also repeat with "latest" in place of "staging" to test the latest deployment locally.
