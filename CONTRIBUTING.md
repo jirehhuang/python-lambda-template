@@ -13,7 +13,7 @@
 	1. Specify GitHub organization (`org`), repository, and branch
 	1. Add permissions: `AWSLambda_FullAccess`, `IAMReadOnlyAccess`, and `AmazonAPIGatewayAdministrator`
 	1. Role name: `github-{org}-oidc-lambda-deployer`
-	1. Update `GH_OIDC_ROLE_NAME` in [continuous_integration.yml](.github/workflows/continuous_integration.yml)
+	1. Update `GH_OIDC_ROLE_NAME` in [ci-cd.yml](.github/workflows/ci-cd.yml)
 
 ### New system
 
