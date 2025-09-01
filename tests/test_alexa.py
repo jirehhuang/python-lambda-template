@@ -85,15 +85,6 @@ def fixture_launch_intent_payload():
     )
 
 
-@pytest.fixture(name="help_intent_payload", scope="module")
-def fixture_help_intent_payload():
-    """Return HelpIntent test event JSON."""
-    return make_request_payload(
-        request_type="IntentRequest",
-        intent_name="AMAZON.HelpIntent",
-    )
-
-
 @pytest.fixture(name="session_ended_payload", scope="module")
 def fixture_session_ended_payload():
     """Return Alexa End Session test event JSON."""
@@ -120,11 +111,50 @@ def test_general_intent(query):
     assert query in response["response"]["outputSpeech"]["ssml"]
 
 
-def test_help_intent(help_intent_payload):
+def test_help_intent():
     """Test that invoking HelpIntent returns the expected response."""
-    response = lambda_handler(help_intent_payload, None)
+    response = lambda_handler(
+        make_request_payload(
+            request_type="IntentRequest",
+            intent_name="AMAZON.HelpIntent",
+        ),
+        None,
+    )
     assert np.any(
         _text_output(group="speak", key="help")
+        in response["response"]["outputSpeech"]["ssml"]
+    )
+
+
+@pytest.mark.parametrize(
+    "intent", ["AMAZON.CancelIntent", "AMAZON.StopIntent"]
+)
+def test_cancel_stop_intent(intent):
+    """Test that invoking CancelOrStopIntent returns the expected response."""
+    response = lambda_handler(
+        make_request_payload(
+            request_type="IntentRequest",
+            intent_name=intent,
+        ),
+        None,
+    )
+    assert np.any(
+        _text_output(group="speak", key="cancel")
+        in response["response"]["outputSpeech"]["ssml"]
+    )
+
+
+def test_fallback_intent():
+    """Test that invoking FallbackIntent returns the expected response."""
+    response = lambda_handler(
+        make_request_payload(
+            request_type="IntentRequest",
+            intent_name="AMAZON.FallbackIntent",
+        ),
+        None,
+    )
+    assert np.any(
+        _text_output(group="speak", key="fallback")
         in response["response"]["outputSpeech"]["ssml"]
     )
 
@@ -133,3 +163,18 @@ def test_session_ended(session_ended_payload):
     """Test that invoking SessionEndedRequest returns the expected response."""
     response = lambda_handler(session_ended_payload, None)
     assert response["response"] == {}
+
+
+def test_catch_all_exception():
+    """Test that invoking HelpIntent returns the expected response."""
+    response = lambda_handler(
+        make_request_payload(
+            request_type="IntentRequest",
+            intent_name="InvalidIntent",
+        ),
+        None,
+    )
+    assert np.any(
+        _text_output(group="speak", key="catch")
+        in response["response"]["outputSpeech"]["ssml"]
+    )
