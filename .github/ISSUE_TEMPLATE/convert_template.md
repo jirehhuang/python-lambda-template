@@ -9,7 +9,7 @@ assignees: []
 # Checklist
 
 - [ ] Add `main` ruleset
-- [ ] Update `FUNCTION_NAME` in [continuous_integration.yml](.github/workflows/continuous_integration.yml)
+- [ ] Update `FUNCTION_NAME` in [ci-cd.yml](.github/workflows/ci-cd.yml)
 - [ ] Create Lambda execution role
 - [ ] Modify the docstring in [`__init__.py`](lambda_function/__init__.py)
 - [ ] Tailor the [README](README.md)
