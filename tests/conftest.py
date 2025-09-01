@@ -18,16 +18,15 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.fixture(scope="session")
-def api_env(pytestconfig):
+@pytest.fixture(name="api_env", scope="session")
+def fixture_api_env(pytestconfig):
     """Return detected API environment."""
     url = pytestconfig.getoption("--url")
     return url if url in ["latest", "staging", "prod"] else None
 
 
-# pylint: disable=redefined-outer-name
-@pytest.fixture(scope="session")
-def api_url(api_env, pytestconfig):
+@pytest.fixture(name="api_url", scope="session")
+def fixture_api_url(api_env, pytestconfig):
     """Return retrieved API URL, from alias if applicable."""
     url = pytestconfig.getoption("--url")
 
@@ -44,9 +43,8 @@ def api_url(api_env, pytestconfig):
     return url
 
 
-# pylint: disable=redefined-outer-name
-@pytest.fixture(scope="session")
-def api_key(api_url):
+@pytest.fixture(name="api_key", scope="session")
+def fixture_api_key(api_url):
     """Return retrieved API key based on API URL."""
     env_file = Path(__file__).resolve().parents[2] / ".env"
     if env_file.exists():
