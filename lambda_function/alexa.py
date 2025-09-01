@@ -31,17 +31,8 @@ SPEAK_OUTPUT = {
     "cancel": [
         "Goodbye!",
     ],
-    "fallback": [
-        "Hmm, I'm not sure. What would you like to do?",
-    ],
     "catch": [
         "Sorry, I had trouble doing what you asked. Please try again.",
-    ],
-}
-
-ASK_OUTPUT = {
-    "fallback": [
-        "I didn't catch that. What can I help you with?",
     ],
 }
 
@@ -56,7 +47,6 @@ API_OUTPUT = {
 
 TEXT_OUTPUT = {
     "speak": SPEAK_OUTPUT,
-    "ask": ASK_OUTPUT,
     "api": API_OUTPUT,
 }
 
@@ -157,27 +147,6 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
         return handler_input.response_builder.speak(speak_output).response
 
 
-class FallbackIntentHandler(AbstractRequestHandler):
-    """Single handler for Fallback Intent."""
-
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return ask_utils.is_intent_name("AMAZON.FallbackIntent")(handler_input)
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        logger.info("In FallbackIntentHandler")
-
-        speak_output = _text_output(group="speak", key="fallback")
-        ask_output = _text_output(group="ask", key="fallback")
-
-        return (
-            handler_input.response_builder.speak(speak_output)
-            .ask(ask_output)
-            .response
-        )
-
-
 class SessionEndedRequestHandler(AbstractRequestHandler):
     """Handler for Session End."""
 
@@ -216,7 +185,6 @@ sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(GeneralIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
-sb.add_request_handler(FallbackIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 
 sb.add_exception_handler(CatchAllExceptionHandler())

@@ -144,21 +144,6 @@ def test_cancel_stop_intent(intent):
     )
 
 
-def test_fallback_intent():
-    """Test that invoking FallbackIntent returns the expected response."""
-    response = lambda_handler(
-        make_request_payload(
-            request_type="IntentRequest",
-            intent_name="AMAZON.FallbackIntent",
-        ),
-        None,
-    )
-    assert np.any(
-        _text_output(group="speak", key="fallback")
-        in response["response"]["outputSpeech"]["ssml"]
-    )
-
-
 def test_session_ended(session_ended_payload):
     """Test that invoking SessionEndedRequest returns the expected response."""
     response = lambda_handler(session_ended_payload, None)
