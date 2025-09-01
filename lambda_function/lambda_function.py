@@ -8,7 +8,6 @@ from .responder import echo
 from .utils import _make_response
 
 
-# pylint: disable=unused-argument
 def lambda_handler(event: Any, context: Any) -> Any:
     """Lambda handler."""
     try:
