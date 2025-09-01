@@ -18,16 +18,15 @@ def pytest_addoption(parser):
     )
 
 
-@pytest.fixture(scope="session")
-def api_env(pytestconfig):
+@pytest.fixture(name="api_env", scope="session")
+def fixture_api_env(pytestconfig):
     """Return detected API environment."""
     url = pytestconfig.getoption("--url")
     return url if url in ["latest", "staging", "prod"] else None
 
 
-# pylint: disable=redefined-outer-name
-@pytest.fixture(scope="session")
-def api_url(api_env, pytestconfig):
+@pytest.fixture(name="api_url", scope="session")
+def fixture_api_url(api_env, pytestconfig):
     """Return retrieved API URL, from alias if applicable."""
     url = pytestconfig.getoption("--url")
 
@@ -44,10 +43,21 @@ def api_url(api_env, pytestconfig):
     return url
 
 
-# pylint: disable=redefined-outer-name
-@pytest.fixture(scope="session")
-def api_key(api_url):
-    """Return retrieved API key based on API URL."""
+class SecretStr(str):
+    """Ensure a sensitive str is not exposed in logs."""
+
+    def __repr__(self):
+        """Redact string representation."""
+        return "<redacted>"
+
+    def __str__(self):
+        """Redact string representation."""
+        return "<redacted>"
+
+
+@pytest.fixture(name="api_key", scope="session")
+def fixture_api_key(api_url):
+    """Return retrieved API key based on API URL, redacted for test output."""
     env_file = Path(__file__).resolve().parents[2] / ".env"
     if env_file.exists():
         load_dotenv(env_file)
@@ -56,11 +66,14 @@ def api_key(api_url):
         return None
 
     parsed = urlparse(api_url)
+    key = None
     if parsed.path.endswith("/staging") or parsed.path.endswith("/latest"):
-        return os.getenv("STAGING_API_KEY")
-    if parsed.path.endswith("/prod"):
-        return os.getenv("PROD_API_KEY")
-    return None
+        key = os.getenv("STAGING_API_KEY")
+    elif parsed.path.endswith("/prod"):
+        key = os.getenv("PROD_API_KEY")
+    if key is not None:
+        return SecretStr(key)
+    return key
 
 
 def pytest_collection_modifyitems(config, items):
