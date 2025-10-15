@@ -44,7 +44,7 @@ jobs:
       - name: Install Poetry
         uses: abatilo/actions-poetry@v4
         with:
-          poetry-version: "1.8.3"
+          poetry-version: "2.1.4"
 
       - name: Install dependencies
         run: poetry install
@@ -56,7 +56,7 @@ jobs:
         run: |
           SCORE=$(poetry run pylint lambda_function --exit-zero --score=y | grep "Your code has been rated at" | awk '{print $7}' | cut -d'/' -f1)
           echo "Pylint score: $SCORE"
-          if ! python -c "exit(0 if float('$SCORE') >= 10.0 else 1)"; then
+          if [ -n "$SCORE" ] && ! python -c "exit(0 if float('$SCORE') >= 10.0 else 1)"; then
             echo "ERROR: Pylint score < 10.0"
             exit 1
           fi
