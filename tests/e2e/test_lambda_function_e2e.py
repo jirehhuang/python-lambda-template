@@ -19,6 +19,7 @@ def test_no_query(api_url, api_key, query):
     """Test that if an invalid body is provided, the API response correctly
     returns a fail message."""
     response = query2response(api_url, api_key, query)
+    assert "status" in response
     assert response["status"] == "fail" and "fail" in response["data"]
     assert (
         _text_output(group="api", key="no_query") in response["data"]["fail"]
@@ -30,5 +31,6 @@ def test_query(api_url, api_key, query, expected):
     """Test that if an invalid body is provided, the API response correctly
     returns a fail message."""
     response = query2response(api_url, api_key, query)
+    assert "status" in response
     assert response["status"] == "success"
     assert response["data"]["text"] == expected
