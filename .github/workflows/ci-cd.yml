@@ -126,6 +126,7 @@ jobs:
           BUILD_DIR=".package"
           rm -rf "$BUILD_DIR" lambda.zip
           mkdir -p "$BUILD_DIR"
+          poetry self add poetry-plugin-export
           poetry export -f requirements.txt --without-hashes | pip install -r /dev/stdin -t "$BUILD_DIR"
           cp -r lambda_function/ "$BUILD_DIR"/
           cd "$BUILD_DIR" && zip -r ../lambda.zip .
@@ -248,6 +249,7 @@ jobs:
           BUILD_DIR=".package"
           rm -rf "$BUILD_DIR" lambda.zip
           mkdir -p "$BUILD_DIR"
+          poetry self add poetry-plugin-export
           poetry export -f requirements.txt --without-hashes | pip install -r /dev/stdin -t "$BUILD_DIR"
           cp -r lambda_function/ "$BUILD_DIR"/
           cd "$BUILD_DIR" && zip -r ../lambda.zip .
