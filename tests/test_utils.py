@@ -27,8 +27,7 @@ def test_make_response_json_serializable():
 
 def test_make_response_not_json_serializable():
     """Test that `_make_response` correctly throws an error if the provided
-    data is not json serializable.
-    """
+    data is not json serializable."""
     with pytest.raises(ValueError, match="Response is not JSON serializable"):
         _make_response(
             data={"text": {"A set is not JSON serializable"}},
